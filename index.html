@@ -1,0 +1,1361 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071a33" />
+  <title>Bitcoin Fees Live - BTC vs BCH Transaction Fees</title>
+
+  <style>
+    :root {
+      --background: #061426;
+      --background-light: #0a2342;
+      --card: rgba(15, 44, 78, 0.72);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --text: #f7fbff;
+      --muted: #9fb3c8;
+      --btc: #f7931a;
+      --bch: #0ac18e;
+      --accent: #53a9ff;
+      --success: #65e6ad;
+      --shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      color: var(--text);
+      font-family:
+        Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(40, 104, 171, 0.28), transparent 30%),
+        radial-gradient(circle at 90% 85%, rgba(19, 131, 130, 0.18), transparent 28%),
+        var(--background);
+    }
+
+    .container {
+      width: min(1120px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 0;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      font-size: 1.05rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 800;
+      border-radius: 13px;
+      background: linear-gradient(135deg, #2b8cff, #1650a8);
+      box-shadow: 0 8px 25px rgba(43, 140, 255, 0.3);
+    }
+
+    .updated {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    main {
+      padding: 52px 0 80px;
+    }
+
+    .hero {
+     /* max-width: 720px; */
+      margin-bottom: 48px;
+    }
+
+    .eyebrow {
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin-bottom: 18px;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      line-height: 0.98;
+      letter-spacing: -0.065em;
+    }
+
+    .hero p {
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 1.08rem;
+      line-height: 1.7;
+    }
+
+    .fee-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .fee-card {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+      border: 1px solid var(--card-border);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+    }
+
+    .fee-card::after {
+      position: absolute;
+      right: -65px;
+      bottom: -85px;
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      opacity: 0.1;
+      content: "";
+    }
+
+    .fee-card.btc::after {
+      background: var(--btc);
+    }
+
+    .fee-card.bch::after {
+      background: var(--bch);
+    }
+
+    .coin-header {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 34px;
+    }
+
+    .coin-info {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+    }
+
+    .coin-icon {
+      display: grid;
+      width: 48px;
+      height: 48px;
+      place-items: center;
+      color: #fff;
+      font-size: 1.35rem;
+      font-weight: 800;
+      border-radius: 50%;
+    }
+
+    .btc .coin-icon {
+      background: var(--btc);
+    }
+
+    .bch .coin-icon {
+      background: var(--bch);
+    }
+
+    .coin-name {
+      font-size: 22pt;
+      font-weight: 750;
+    }
+
+    .coin-symbol {
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      color: var(--success);
+      font-size: 0.75rem;
+      font-weight: 700;
+      border: 1px solid rgba(101, 230, 173, 0.2);
+      border-radius: 999px;
+      background: rgba(101, 230, 173, 0.08);
+    }
+
+    .status::before {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+      content: "";
+      box-shadow: 0 0 0 4px rgba(101, 230, 173, 0.1);
+    }
+
+    .fee-label {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .fee-value {
+      position: relative;
+      z-index: 1;
+      margin: 7px 0 8px;
+      font-size: clamp(2.5rem, 6vw, 4.3rem);
+      font-weight: 800;
+      letter-spacing: -0.07em;
+    }
+
+    .fee-unit {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: 0.86rem;
+    }
+
+    .fee-breakdown {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 32px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(255, 255, 255, 0.09);
+    }
+
+    .fee-breakdown div {
+      min-width: 0;
+    }
+
+    .fee-breakdown span {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.73rem;
+    }
+
+    .fee-breakdown strong {
+      font-size: 0.95rem;
+    }
+
+    .info-panel {
+    /*  display: flex; */
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      margin-top: 22px;
+      padding: 22px 24px;
+      border: 1px solid var(--card-border);
+      border-radius: 18px;
+      background: rgba(15, 44, 78, 0.42);
+    }
+
+    .info-panel p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .refresh-button {
+      flex: 0 0 auto;
+      padding: 11px 17px;
+      color: #fff;
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 750;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    .refresh-button:hover {
+      background: #78bcff;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      padding: 0 0 30px;
+      color: #7189a3;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    @media (max-width: 700px) {
+      .container {
+        width: min(100% - 28px, 560px);
+      }
+
+      header {
+        padding: 20px 0;
+      }
+
+      .updated {
+     /*   display: none; */
+     
+      }
+
+    .donations {
+        margin-bottom:40px;
+        
+    }
+
+      main {
+        padding: 55px 0 60px;
+      }
+
+      .fee-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .fee-card {
+        padding: 23px;
+      }
+
+      .info-panel {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .refresh-button {
+        width: 100%;
+      }
+      
+      .coin-name {
+          font-size:18pt;
+          
+      }
+    }
+    
+    /* GLOW */
+    
+    .fee-card {
+  position: relative;
+  overflow: hidden;
+  padding: 28px;
+  border: 1px solid rgba(137, 207, 255, 0.28);
+  border-radius: 24px;
+  background: var(--card);
+  box-shadow:
+    0 0 18px rgba(83, 169, 255, 0.2),
+    0 0 45px rgba(83, 169, 255, 0.1),
+    var(--shadow);
+  backdrop-filter: blur(16px);
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.fee-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(160, 222, 255, 0.65);
+  box-shadow:
+    0 0 24px rgba(111, 195, 255, 0.42),
+    0 0 65px rgba(83, 169, 255, 0.22),
+    var(--shadow);
+}
+
+/* DONATION MODAL */
+.donations-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  color: #fff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 750;
+  border: 1px solid rgba(143, 213, 255, 0.35);
+  border-radius: 10px;
+  background: rgba(57, 139, 214, 0.2);
+  box-shadow: 0 0 18px rgba(83, 169, 255, 0.15);
+  margin-right:20px;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.donations-button:hover {
+  background: rgba(83, 169, 255, 0.35);
+  border-color: rgba(169, 226, 255, 0.75);
+  transform: translateY(-2px);
+}
+
+.donations-button span {
+  color: #a7ddff;
+  font-size: 1.15rem;
+ 
+}
+
+.donation-modal {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.donation-modal.active {
+  display: flex;
+}
+
+.donation-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 10, 24, 0.82);
+  backdrop-filter: blur(8px);
+}
+
+.donation-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 430px);
+  padding: 32px;
+  overflow: hidden;
+  text-align: center;
+  border: 1px solid rgba(139, 213, 255, 0.35);
+  border-radius: 24px;
+  background:
+    radial-gradient(
+      circle at 50% -10%,
+      rgba(83, 169, 255, 0.24),
+      transparent 42%
+    ),
+    #0b2544;
+  box-shadow:
+    0 0 25px rgba(111, 195, 255, 0.35),
+    0 0 80px rgba(83, 169, 255, 0.18),
+    0 24px 80px rgba(0, 0, 0, 0.5);
+  animation: donationPop 0.25s ease-out;
+}
+
+@keyframes donationPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94) translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.close-button {
+  position: absolute;
+  top: 14px;
+  right: 17px;
+  width: 34px;
+  height: 34px;
+  color: #a9bfd5;
+  font-size: 1.7rem;
+  line-height: 1;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.close-button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.donation-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  margin: 0 auto 20px;
+  place-items: center;
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 800;
+  border-radius: 50%;
+  background: #0ac18e;
+  box-shadow: 0 0 25px rgba(10, 193, 142, 0.35);
+}
+
+.donation-dialog h2 {
+  margin-bottom: 12px;
+  font-size: 1.65rem;
+  letter-spacing: -0.04em;
+}
+
+.donation-dialog p {
+  margin: 0 auto 24px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.qr-wrapper {
+  display: grid;
+  width: 220px;
+  height: 220px;
+  margin: 0 auto 24px;
+  padding: 12px;
+  place-items: center;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 0 30px rgba(149, 219, 255, 0.35);
+}
+
+#bchQrCode,
+#bchQrCode img,
+#bchQrCode canvas {
+  display: block;
+  max-width: 100%;
+}
+
+.address-label {
+  margin-bottom: 8px;
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: left;
+}
+
+.address-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px;
+  text-align: left;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.address-row code {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  color: #c2e9ff;
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-button {
+  flex: 0 0 auto;
+  padding: 8px 11px;
+  color: #06203a;
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 800;
+  border: 0;
+  border-radius: 7px;
+  background: #a9ddff;
+  cursor: pointer;
+}
+
+.copy-button:hover {
+  background: #d2efff;
+}
+
+.copy-message {
+  height: 18px;
+  margin-top: 10px;
+  color: var(--success);
+  font-size: 0.78rem;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.copy-message.visible {
+  opacity: 1;
+}
+
+@media (max-width: 500px) {
+  header {
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .brand {
+    font-size: 0.95rem;
+  }
+
+  .donations-button {
+    padding: 9px 11px;
+  }
+
+  .donation-dialog {
+    padding: 27px 20px;
+  }
+}
+
+
+#bchAddress {
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#bchAddress::-webkit-scrollbar {
+  display: none;
+}
+    
+.price {
+    opacity:0.7;
+    color: grey;
+    font-size:14pt;
+}
+
+/* FAQ section */
+.faq-section {
+ /* width: min(100% - 2rem, 900px); */
+  margin: 2rem auto;
+  padding: 1.5rem;
+  box-sizing: border-box;
+
+  /* background: rgba(255, 255, 255, 0.06); */
+  background: rgba(15, 44, 78, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  color: inherit;
+}
+
+.faq-section h2 {
+  margin: 0 0 1.25rem;
+  text-align: center;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  line-height: 1.2;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+}
+
+.faq-item {
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.faq-question {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 1rem 1.1rem;
+
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.faq-question::after {
+  content: "+";
+  flex: 0 0 auto;
+  font-size: 1.35rem;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+.faq-item[open] .faq-question::after {
+  content: "−";
+}
+
+.faq-question:hover,
+.faq-question:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.faq-question:focus-visible {
+  outline: 2px solid #f7931a;
+  outline-offset: -2px;
+}
+
+.faq-answer {
+  padding: 20px;
+  color: inherit;
+  opacity: 0.86;
+  line-height: 1.65;
+}
+
+.faq-answer p {
+  margin: 0;
+}
+
+/* Small screens */
+@media (max-width: 600px) {
+  .faq-section {
+    width: min(100% - 1rem, 900px);
+    margin: 1.25rem auto;
+    padding: 1rem;
+    border-radius: 12px;
+  }
+
+  .faq-question {
+    padding: 0.9rem;
+    font-size: 0.95rem;
+  }
+
+  .faq-answer {
+    padding: 0 0.9rem 0.9rem;
+    font-size: 0.92rem;
+  }
+}
+
+    
+  </style>
+  
+  
+  
+  <!-- SEO things -->
+  <meta
+  name="description"
+  content="Check live Bitcoin and Bitcoin Cash transaction fees, including next-block and median fee estimates. Compare BTC and BCH fees updated approximately every 2 minutes."
+>
+
+<link rel="canonical" href="https://bitcoinfees.live/">
+
+<meta name="robots" content="index,follow">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://bitcoinfees.live/">
+<meta property="og:title" content="Bitcoin Fees Live - BTC vs BCH transaction fees">
+<meta property="og:description" content="Compare live Bitcoin and Bitcoin Cash transaction fee estimates for faster, more informed transactions.">
+<meta property="og:image" content="https://bitcoinfees.live/img/og-image.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bitcoin Fees Live - BTC vs BCH transaction fees">
+<meta name="twitter:site" content="@keepbitcoinfree">
+<meta name="twitter:description" content="Compare live BTC and BCH transaction fees and confirmation estimates.">
+<meta name="twitter:image" content="https://bitcoinfees.live/img/og-image.png">
+
+  <!-- ICONS -->
+  <link rel="icon" href="https://bitcoinfees.live/img/kbficon-32x32.png" sizes="32x32">
+  <link rel="icon" href="https://bitcoinfees.live/img/kbficon-192x192.png" sizes="192x192">
+  <meta name="msapplication-TileImage" content="https://bitcoinfees.live/img/kbficon-270x270.png">
+  <link rel="apple-touch-icon" href="https://bitcoinfees.live/img/kbficon-180x180.png">
+  
+<!-- FAQ Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What are Bitcoin transaction fees?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bitcoin transaction fees are payments included with transactions so miners can prioritize and confirm them in a block. Transaction fees and block rewards are the incentives for miners to mine the blockchain."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the next-block fee?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The next-block fee is an estimate of the fee rate that may help a transaction confirm in the next available block."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the median Bitcoin fee?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The median fee represents the middle fee value among a selected group of recent transactions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How often are the fee estimates updated?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "BitcoinFees.Live updates its displayed fee data approximately every two minutes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Are these fee estimates guaranteed?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Fee estimates are probabilistic and can change as network conditions change. Always review the fee recommended by your wallet before sending."
+      }
+    }
+  ]
+}
+
+</script>
+
+<!-- WebApplication and WebSite Structured Data -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://bitcoinfees.live/#website",
+      "name": "Bitcoin Fees Live",
+      "alternateName": "BitcoinFees.Live",
+      "url": "https://bitcoinfees.live/",
+      "description": "Live BTC and BCH transaction fee estimates and comparisons."
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://bitcoinfees.live/#application",
+      "name": "Bitcoin Fees Live",
+      "url": "https://bitcoinfees.live/",
+      "description": "Compare live Bitcoin and Bitcoin Cash transaction fee estimates, including next-block and median fees.",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Any",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  ]
+}
+</script>
+  
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <!-- <div class="brand-mark">₿</div> -->
+        <a href="https://keepbitcoinfree.org" target="_blank"><img src="/img/kbf-bch-logo.png" width="55px" height="55px" alt="Bitcoin Fees Live logo" /></a>
+        <span>Bitcoin Fees Live </span>
+      </div>
+  
+      <div class="updated">
+          
+    <button class="donations-button" id="donationsButton">
+        <span>♡</span>
+         Donations
+    </button>   
+    <br /><br />
+        Last Updated <span id="lastUpdated" aria-live="polite"><span id="current-date">just now</span></span>
+      
+      </div>
+    </header>
+
+    <main>
+        
+        <!-- DONATION MODAL POP-UP -->
+        <div class="donation-modal" id="donationModal" aria-hidden="true">
+  <div class="donation-overlay" id="donationOverlay"></div>
+
+  <div
+    class="donation-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="donationTitle"
+  >
+    <button
+      class="close-button"
+      id="closeDonation"
+      aria-label="Close donation window"
+    >
+      &times;
+    </button>
+
+    <div class="donation-icon">₿</div>
+
+    <div class="eyebrow">Support this project</div>
+    <h2 id="donationTitle">Donate with Bitcoin Cash</h2>
+
+    <p>
+      Scan the QR code with your Bitcoin Cash wallet to send a donation.
+    </p>
+
+    <div class="qr-wrapper">
+      <div id="bchQrCode"></div>
+    </div>
+
+    <div class="address-label">Bitcoin Cash address</div>
+
+    <div class="address-row">
+      <code id="bchAddress">
+        bitcoincash:qr39kpxrjzaeazsahwn9hny6pscf3uch8sqd00usfj
+      </code>
+
+      <button class="copy-button" id="copyAddress">
+        Copy
+      </button>
+    </div>
+
+    <div class="copy-message" id="copyMessage">
+      Address copied
+    </div>
+  </div>
+</div>
+
+        
+      <section class="hero">
+        <div class="eyebrow">Electronic Cash Fees</div>
+        <h1>Bitcoin Fees for <span style="color:#0AC18E">p2p</span> ecash</h1>
+        <p>
+    Compare current Bitcoin (BTC) and Bitcoin Cash (BCH) transaction fee
+     estimates, including next-block and median fees.
+        </p>
+      </section>
+
+      <section class="fee-grid" aria-label="Current cryptocurrency fees">
+        <article class="fee-card btc">
+          <div class="coin-header">
+            <div class="coin-info">
+              <div class="coin-icon">₿</div> 
+              <!--  <img src="/img/btc-logo.png" alt="Bitcoin BTC logo" width="55px" height="55px" /> -->
+              <div>
+                <div class="coin-name">Bitcoin <span id="btcPrice" class="price"></span></div>
+                <div class="coin-symbol">BTC</div>
+              </div>
+            </div>
+            <div class="status">Live</div>
+          </div>
+
+          <div class="fee-label">Next Block Fee</div>
+          <div class="fee-value" id="btc-nbf" aria-live="polite"><span style="font-size:16pt">Loading...</span></div>
+           <div class="fee-breakdown"> </div>
+          <div class="fee-label">Current Median Fee</div>
+          <div class="fee-value" id="btc-cmf" aria-live="polite"><span style="font-size:16pt">Loading...</span></div>
+
+    <!--       <div class="fee-breakdown">
+           <div>
+              <span>Fast</span>
+              <strong id="btcFast">18</strong> sat/vB
+            </div>
+            <div>
+              <span>Standard</span>
+              <strong id="btcStandard">12</strong> sat/vB
+            </div>
+            <div>
+              <span>Economy</span>
+              <strong id="btcEconomy">7</strong> sat/vB
+            </div> 
+          </div> -->
+        </article>
+
+        <article class="fee-card bch">
+          <div class="coin-header">
+            <div class="coin-info">
+              <div class="coin-icon">₿</div>
+              <div>
+                <div class="coin-name">Bitcoin Cash <span id="bchPrice" class="price"></span></div>
+                <div class="coin-symbol">BCH</div>
+              </div>
+            </div>
+            <div class="status">Live</div>
+          </div>
+
+          <div class="fee-label">Next Block Fee</div>
+          <div class="fee-value" id="bch-nbf" aria-live="polite"><span style="font-size:16pt">Loading...</span></div>
+          <div class="fee-breakdown"> </div>
+          <div class="fee-label">Current Median Fee</div>
+          <div class="fee-value" id="bch-cmf" aria-live="polite"><span style="font-size:16pt">Loading...</span></div>
+          <!-- <div class="fee-unit">sat/byte</div> -->
+
+   <!--       <div class="fee-breakdown">
+            <div>
+              <span>Fast</span>
+              <strong id="bchFast">2</strong> sat/byte
+            </div>
+            <div>
+              <span>Standard</span>
+              <strong id="bchStandard">1</strong> sat/byte
+            </div>
+            <div>
+              <span>Economy</span>
+              <strong id="bchEconomy">1</strong> sat/byte
+            </div> 
+          </div> -->
+        </article>
+      </section>
+<br /><br />
+      <section class="info-panel">
+        
+        <h2 style="margin-bottom:10px; ">Bitcoin Fee Estimates for BTC and BCH</h2>
+        <p style="margin-bottom:20px;">
+        Fee estimates are shown in USD and use an average transaction size of
+  approximately 145 virtual bytes. Actual fees vary according to transaction
+  size, wallet settings, mempool conditions, and network demand.
+        </p>
+  
+        <h3 style="margin-bottom:10px;">Status</h3>
+        <p id="fee-status" role="status" aria-live="polite">
+        <span id="feestatus">   Loading current fee estimates… </span> <span id="current-date"></span>
+        </p>
+        
+
+<!--
+
+          Fee estimates are displayed in USD and assume a transaction with an avg size of 145vb. 
+          BitcoinFees.Live pulls real transaction fee data from the BTC & BCH blockchains, compares & displays it simply so you can determine which Bitcoin Fork works best as peer-to-peer electronic cash. 
+          You should use both BTC & BCH Forks and make your own decision. 
+
+<b>What are Bitcoin transaction fees?</b><br />
+Bitcoin transaction fees are included with any Bitcoin transaction so that it can be validated by a Bitcoin miner which then in turn gets the transaction confirmed and included on the blockchain. Once a transaction is confirmed on the blockchain, it is irreversible. Transaction fees are part of the incentives for miners to mine the Bitcoin blockchain. The other part of incentives for miners is the block reward for each mined block.
+<br /><br />
+
+<b>What is next block fee and median fee mean?</b><br />
+Bitcoin is made up of transactions which fill blocks, which then get chained together, forming an immutable blockchain. Each block processed takes about ~10 minutes. For example, to process 6 blocks takes about an hour on average. Typically, most people using Bitcoin as a currency don’t want to wait many blocks for their transactions to be confirmed, so they pay next block fees to get their transaction confirmed within 10 minute block times. Median fees are just the middle of all the fees to give users a better idea of the average, discarding high and low fees. The median fee listed is based on the past week of transactions.
+<br /><br />
+
+<b>Why are Bitcoin Core transaction fees much higher than Bitcoin Cash?</b> <br />
+Bitcoin Core (BTC) fees are much higher due to a limit on block capacity. The block space available for transactions on the BTC network is currently limited to 1MB. This means that transactions on the BTC network during times of congestion can skyrocket up and become very expensive as people try to outbid each other to try to get their transactions confirmed. BTC originally wasn’t designed in this way, but was changed later by Core developers to change BTC into a settlement system. Bitcoin Cash (BCH) transaction fees are much less as the block space is not limited to a low capacity. BCH has scaled onchain allowing for a lot of extra block space for adoption and low fees.
+
+<br /><br />
+<b>How does BitcoinFees.Live work? </b><br />
+Thanks to a few API providers & some simple JavaScript, BitcoinFees.Live was able to blast off. Fee data is provided by Mempool.space & price data is provided by BlockChair.com. All live fee data is updated every ~2 minutes. Disclaimer: The fee amounts shown on here are for informational purposes only and due to the decentralized nature of Bitcoin the fees shown are probabilistic and there are no guarantees that they will work. You should probably just use the fee recommended by your wallet. How can I support Bitcoin Cash? Bitcoin Cash is Bitcoin, just like how Bitcoin Core is Bitcoin. Both are Forks of the original source code that have brought the world a new idea of money. However, Bitcoin Cash aims to follow the original ideas of Bitcoin in being peer-to-peer electronic cash. In doing so, Bitcoin Cash developers have been working hard to make BCH the best money in the world. You can support BCH by supporting these websites: BitcoinCash.org, Bitcoin.com, BitcoinCashers.org, BitPay.com and many others. <a onClick="donateModal()" ><span style="color:blue; cursor: pointer;">Donate to help SUPPORT US 🙂</span></a> 
+<br />
+     -->
+ </p>
+ 
+
+ <!--       <button class="refresh-button" id="refreshButton">
+          Refresh fees
+        </button> -->
+      </section>
+      
+      <!-- FAQ Section -->
+      
+      <section class="faq-section" aria-labelledby="faq-heading">
+  <h2 id="faq-heading">Frequently Asked Questions</h2>
+
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary class="faq-question">
+        What are Bitcoin transaction fees?
+      </summary>
+      <div class="faq-answer">
+        <p>
+          Bitcoin transaction fees are payments included with transactions so
+          miners can prioritize and confirm them in a block. 
+          Transaction fees and block rewards are the incentives for miners to mine the blockchain. 
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">
+        What is the next-block fee?
+      </summary>
+      <div class="faq-answer">
+        <p>
+          The next-block fee is an estimate of the fee rate that may help a
+          transaction confirm in the next available block.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">
+        What is the median Bitcoin fee?
+      </summary>
+      <div class="faq-answer">
+        <p>
+          The median fee represents the middle fee value among a selected group
+          of recent transactions.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">
+        How often are the fee estimates updated?
+      </summary>
+      <div class="faq-answer">
+        <p>
+          BitcoinFees.Live updates its displayed fee data approximately every
+          two minutes.
+        </p>
+      </div>
+    </details>
+
+    <details class="faq-item">
+      <summary class="faq-question">
+        Are these fee estimates guaranteed?
+      </summary>
+      <div class="faq-answer">
+        <p>
+          No. Fee estimates are probabilistic and can change as network
+          conditions change. Always review the fee recommended by your wallet
+          before sending.
+        </p>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+      
+      
+    </main>
+
+    <footer>
+      Built for fast, simple crypto fee tracking.<br /><br />
+      <a onClick="donateModal()" ><span style="color:lightblue; cursor: pointer;">Donate to help SUPPORT US 🙂</span></a> 
+<br /><br />
+    <a href="https://keepbitcoinfree.org" target="_blank"><img src="/img/kbf-bch-logo.png" width="55px" height="55px" alt="Bitcoin Fees Live logo" /></a>
+    </footer>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+<script>
+
+  // On Page Load...
+  window.addEventListener("DOMContentLoaded", () => {
+    
+    // on page load, set init BTC & BCH fees and last updated datetime.
+     // loadData();
+    setLastUpdated();
+  });
+  
+  function setLastUpdated() {
+      const dateElement = document.getElementById("current-date");
+    const today = new Date();
+    dateElement.textContent = today.toLocaleString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        second: "2-digit",
+        timeZoneName: "short"
+      });
+}
+
+  const donationModal = document.getElementById("donationModal");
+  const donationsButton = document.getElementById("donationsButton");
+  const closeDonation = document.getElementById("closeDonation");
+  const donationOverlay = document.getElementById("donationOverlay");
+  const copyAddress = document.getElementById("copyAddress");
+  const bchAddress = document.getElementById("bchAddress");
+  const copyMessage = document.getElementById("copyMessage");
+  const qrContainer = document.getElementById("bchQrCode");
+
+  // Donation Bitcoin Cash address.
+  const donationAddress =
+    "bitcoincash:qr39kpxrjzaeazsahwn9hny6pscf3uch8sqd00usfj";
+
+  function generateDonationQr() {
+    qrContainer.innerHTML = "";
+
+    new QRCode(qrContainer, {
+      text: donationAddress,
+      width: 196,
+      height: 196,
+      colorDark: "#071a33",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  }
+
+  function openDonationModal() {
+    donationModal.classList.add("active");
+    donationModal.setAttribute("aria-hidden", "false");
+    generateDonationQr();
+    closeDonation.focus();
+  }
+
+  function hideDonationModal() {
+    donationModal.classList.remove("active");
+    donationModal.setAttribute("aria-hidden", "true");
+  }
+
+  donationsButton.addEventListener("click", openDonationModal);
+  closeDonation.addEventListener("click", hideDonationModal);
+  donationOverlay.addEventListener("click", hideDonationModal);
+
+  document.addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      hideDonationModal();
+    }
+  });
+
+  copyAddress.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(donationAddress);
+
+      copyMessage.classList.add("visible");
+      copyAddress.textContent = "Copied";
+
+      setTimeout(() => {
+        copyMessage.classList.remove("visible");
+        copyAddress.textContent = "Copy";
+      }, 1800);
+    } catch {
+      copyAddress.textContent = "Copy failed";
+    }
+  });
+
+  bchAddress.textContent = donationAddress;
+</script>
+
+
+
+  <script>
+    const lastUpdated = document.getElementById("lastUpdated");
+    const refreshButton = document.getElementById("refreshButton");
+
+    function updateTimestamp() {
+      lastUpdated.textContent = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function setFeeData(data) {
+      document.getElementById("btcRecommended").textContent = data.btc.recommended;
+      document.getElementById("btcFast").textContent = data.btc.fast;
+      document.getElementById("btcStandard").textContent = data.btc.standard;
+      document.getElementById("btcEconomy").textContent = data.btc.economy;
+
+      document.getElementById("bchRecommended").textContent = data.bch.recommended;
+      document.getElementById("bchFast").textContent = data.bch.fast;
+      document.getElementById("bchStandard").textContent = data.bch.standard;
+      document.getElementById("bchEconomy").textContent = data.bch.economy;
+
+      updateTimestamp();
+    }
+
+// Load API Data Function pulling from mempool.space/api/v1 & api.blockchair.com
+async function loadData() {
+    try {
+      const [btcFees, btcPrice, bchPrice] = await Promise.all([
+        getJson("https://mempool.space/api/v1/fees/precise"),
+        getJson("https://mempool.space/api/v1/prices"),
+        getJson("https://api.blockchair.com/bitcoin-cash/stats")
+      ]);
+
+       const staticBCHfee = 0.00001000;
+       const avgTxSize = 145;
+       
+       document.getElementById('btcPrice').innerHTML = formatter.format(btcPrice.USD);
+       document.getElementById('bchPrice').innerHTML = formatter.format(bchPrice.data.market_price_usd);
+
+
+      console.log({ btcFees, btcPrice, bchPrice });
+        // create vars with results and set HTML with vars
+        let bchAvgFee = bchPrice.data.median_transaction_fee_usd_24h;
+        let bchNextBlockFee = bchPrice.data.average_transaction_fee_usd_24h;
+        let bchNextBlock = staticBCHfee * bchPrice.data.market_price_usd;
+        // bchNextBlockFee; // could use the avg tx fee as the next block?
+
+
+      let nextBlockFeeBCH = '$' + bchNextBlock.toFixed(5);
+      let currentMedianFeeBCH = '$' + bchAvgFee.toFixed(5);
+
+      document.getElementById('bch-nbf').innerHTML = nextBlockFeeBCH;
+      document.getElementById('bch-cmf').innerHTML = currentMedianFeeBCH;
+
+      console.log('btcPrice.USD = ' + btcPrice.USD);
+
+      let txSizeFeeNext = avgTxSize * btcFees.fastestFee;
+        txSizeFeeNext = txSizeFeeNext * 0.00000001;
+
+      let theNextBlockFeeBTC = btcPrice.USD * txSizeFeeNext;
+      let txSizeFeeAvg = avgTxSize * btcFees.hourFee;
+        txSizeFeeAvg = txSizeFeeAvg * 0.00000001;
+
+      let theCurrentMedianFeeBTC = btcPrice.USD * txSizeFeeAvg;
+      let nextBlockFeeBTC = '$' + theNextBlockFeeBTC.toFixed(5);
+      let currentMedianFeeBTC = '$' + theCurrentMedianFeeBTC.toFixed(5);
+
+      document.getElementById('btc-nbf').innerHTML = nextBlockFeeBTC;
+      document.getElementById('btc-cmf').innerHTML = currentMedianFeeBTC;
+
+    } catch (error) {
+      console.error("One or more requests failed:", error);
+    }
+  }
+
+  async function getJson(url) {
+      
+      let feeStatus = document.getElementById('feestatus');
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      throw new Error(`Request failed: ${response.status}`);
+      feeStatus.textContent =
+    "Current fee estimates are temporarily unavailable.";
+    }else{ 
+         updateTimestamp();   
+           feeStatus.textContent = "Fee estimates updated.";
+           setLastUpdated();
+    }
+
+    return response.json();
+  }
+
+
+
+    function donateModal(){
+        document.getElementById('donationsButton').click();
+    }
+    
+    // Create our number formatter.
+    const formatter = new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    
+      // These options are needed to round to whole numbers if that's what you want.
+      //minimumFractionDigits: 0, // (this suffices for whole numbers, but will print 2500.10 as $2,500.1)
+      //maximumFractionDigits: 0, // (causes 2500.99 to be printed as $2,501)
+    });
+    
+    
+    // MAIN RUN // moving init run to the page load
+    loadData();
+    setInterval(loadData, (60000 * 2)); // default 2 minute refresh rate. If this causes issues with the free APIs, I'll change it.
+    // TODO: add dropdown to let user choose update refresh rate 1min / 3min / 5min / 10min
+
+
+  </script>
+</body>
+</html>

@@ -1,7 +1,7 @@
 # Bitcoin Fees Live
 ### Bitcoin Fees for p2p electronic cash
 
-[![bitcoin-fees-live](https://bitcoinfees.live/img/)](https://bitcoinfees.live/img/og-image.png)
+[![bitcoin-fees-live](https://bitcoinfees.live/img/og-image.png)](https://bitcoinfees.live)]
 [![forthebadge](https://bitcoinfees.live/img/open-source.svg)](https://www.redhat.com/en/topics/open-source/what-is-open-source) [![forthebadge](https://bitcoinfees.live/img/made-with-javascript.svg)](https://mainnet.cash) 
 [![forthebadge](https://bitcoinfees.live/img/built-with-bitcoin-cash.svg)](https://keepbitcoinfree.org)
 

@@ -1311,7 +1311,12 @@ async function loadData() {
       document.getElementById('btc-cmf').innerHTML = currentMedianFeeBTC;
 
     } catch (error) {
+      let feeStatus = document.getElementById('feestatus');
       console.error("One or more requests failed:", error);
+            feeStatus.textContent =
+    "Current fee estimates are temporarily unavailable. " + error;
+      // feeStatus.textContent = "Fee estimates updated ";
+        updateTimestamp();
     }
   }
 
@@ -1326,7 +1331,7 @@ async function loadData() {
     "Current fee estimates are temporarily unavailable.";
     }else{ 
          updateTimestamp();   
-           feeStatus.textContent = "Fee estimates updated.";
+           feeStatus.textContent = "Fee estimates updated ";
            setLastUpdated();
     }
 
